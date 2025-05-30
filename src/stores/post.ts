@@ -53,7 +53,7 @@ export const usePosts = create<PostStore>((set) => ({
       set({ loading: true, error: null })
       const response = await axios.post(`${API_BASE_URL}/api/v1/posts`, post)
       set((state) => ({
-        posts: [...state.posts, response.data],
+        posts: state.posts ? [...state.posts, response.data] : [response.data],
         loading: false
       }))
     } catch (err) {

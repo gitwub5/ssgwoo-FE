@@ -9,7 +9,7 @@ env:
   REGISTRY: docker.io
   IMAGE_NAME: ssgwoo/ssgwoo-frontend
   DEPLOY_YAML_PATH: k8s/frontend-deployment.yaml
-  VITE_API_URL: "http://api.ssgwoo.com"
+  VITE_API_URL: "https://api.ssgwoo.com"
 
 jobs:
   build-and-push:
