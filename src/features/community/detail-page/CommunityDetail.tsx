@@ -39,12 +39,6 @@ const verifyCommentPassword = useComments((state) => state.verifyCommentPassword
 
 
   useEffect(() => {
-    // 1. 캐시 먼저 보여주기
-    const cached = posts.find((p) => p.id === postId)
-    console.log('cached', cached)
-    if (cached) setPost(cached)
-    setLoading(true)
-    // 2. 서버에서 최신 데이터 받아와서 갱신
     getPostById(postId)
     .then((fetched) => {
       setPost(fetched ?? null)
@@ -99,11 +93,13 @@ const verifyCommentPassword = useComments((state) => state.verifyCommentPassword
 
   // 게시글 삭제
   async function handleDeletePost() {
-    if (await deletePost(postId)) {
+    try {
+      await deletePost(postId)
       alert('삭제되었습니다.')
       navigate('/community')
-    } else {
-      alert('비밀번호가 일치하지 않습니다.')
+    } catch (error) {
+      console.error('게시글 삭제 실패:', error)
+      alert('게시글 삭제에 실패했습니다.')
     }
     setPwModal({ open: false, type: null })
   }
@@ -112,6 +108,7 @@ const verifyCommentPassword = useComments((state) => state.verifyCommentPassword
   function handleStartEditPost() {
     if (!post) return
     setEditingPost(true)
+    setPwModal({ open: false, type: null })
   }
 
   // 게시글 수정 완료
@@ -121,11 +118,15 @@ const verifyCommentPassword = useComments((state) => state.verifyCommentPassword
       alert('제목과 내용을 입력해주세요.')
       return
     }
-    if (await editPost(postId, { title, content })) {
-      alert('수정되었습니다.')
+    try {
+      await editPost(postId, { title, content })
+      const updatedPost = await getPostById(postId)
+      setPost(updatedPost)
       setEditingPost(false)
-    } else {
-      alert('비밀번호가 일치하지 않습니다.')
+      alert('수정되었습니다.')
+    } catch (error) {
+      console.error('게시글 수정 실패:', error)
+      alert('게시글 수정에 실패했습니다.')
     }
   }
 
@@ -153,7 +154,8 @@ const verifyCommentPassword = useComments((state) => state.verifyCommentPassword
 
   // 댓글 삭제
   async function handleDeleteComment(commentId: number) {
-    if (await deleteComment(postId, commentId)) {
+    const success = await deleteComment(postId, commentId)
+    if (success) {
       alert('댓글이 삭제되었습니다.')
     } else {
       alert('비밀번호가 일치하지 않습니다.')
@@ -167,6 +169,7 @@ const handlePasswordSubmit = async (pw: string) => {
     const ok = await verifyPostPassword(postId, pw)
     if (!ok) {
       alert('게시글 비밀번호가 일치하지 않습니다.')
+      setPwModal({ open: false, type: null })
       return
     }
     handleStartEditPost()
@@ -174,6 +177,7 @@ const handlePasswordSubmit = async (pw: string) => {
     const ok = await verifyPostPassword(postId, pw)
     if (!ok) {
       alert('게시글 비밀번호가 일치하지 않습니다.')
+      setPwModal({ open: false, type: null })
       return
     }
     handleDeletePost()
@@ -181,6 +185,7 @@ const handlePasswordSubmit = async (pw: string) => {
     const ok = await verifyCommentPassword(postId, pwModal.targetId, pw)
     if (!ok) {
       alert('댓글 비밀번호가 일치하지 않습니다.')
+      setPwModal({ open: false, type: null })
       return
     }
     handleStartEditComment(pwModal.targetId, pwModal.oldContent || '')
@@ -188,6 +193,7 @@ const handlePasswordSubmit = async (pw: string) => {
     const ok = await verifyCommentPassword(postId, pwModal.targetId, pw)
     if (!ok) {
       alert('댓글 비밀번호가 일치하지 않습니다.')
+      setPwModal({ open: false, type: null })
       return
     }
     handleDeleteComment(pwModal.targetId)
@@ -212,7 +218,9 @@ const handlePasswordSubmit = async (pw: string) => {
       />
       <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md w-full">
         <div className="flex items-center gap-3 mb-4 relative">
-          <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${getRandomGradient()} flex items-center justify-center text-white font-bold text-lg shadow`}>G</div>
+          <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${getRandomGradient()} flex items-center justify-center text-white font-bold text-lg shadow`}>
+            {post.nickname[0]}
+          </div>
           <span className="font-semibold text-gray-800">{post.nickname}</span>
           {/* 게시글 케밥 메뉴 */}
           <div className="ml-auto relative">
@@ -236,7 +244,13 @@ const handlePasswordSubmit = async (pw: string) => {
         ) : (
           <>
             <h2 className="text-2xl font-extrabold text-gray-900 mb-2">{post?.title}</h2>
-            <div className="text-gray-500 mb-4">{post?.createdAt?.slice(0, 10)}</div>
+            <div className="text-gray-500 mb-4">{new Date(post?.createdAt).toLocaleDateString('ko-KR', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            })}</div>
             <div className="text-gray-800 leading-relaxed whitespace-pre-line mb-8">{post?.content}</div>
           </>
         )}
