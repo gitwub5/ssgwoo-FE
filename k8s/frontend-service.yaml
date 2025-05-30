@@ -2,6 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: ssgwoo-frontend
+  namespace: ssgwoo-frontend
 spec:
   selector:
     app: ssgwoo-frontend

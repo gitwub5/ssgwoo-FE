@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: ssgwoo-frontend
+  namespace: ssgwoo-frontend
   labels:
     app: ssgwoo-frontend
 spec:
