@@ -4,7 +4,7 @@ metadata:
   name: ssgwoo-frontend
   namespace: ssgwoo-frontend
   labels:
-    app: ssgwoo-frontend5
+    app: ssgwoo-frontend
 spec:
   replicas: 1
   selector:
