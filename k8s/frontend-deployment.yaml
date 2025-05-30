@@ -4,7 +4,7 @@ metadata:
   name: ssgwoo-frontend
   namespace: ssgwoo-frontend
   labels:
-    app: ssgwoo-frontend
+    app: ssgwoo-frontend5
 spec:
   replicas: 1
   selector:
@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: docker.io/ssgwoo/ssgwoo-frontend:vdeploy
+          image: docker.io/ssgwoo/ssgwoo-frontend:vlatest
           imagePullPolicy: Always
           ports:
             - containerPort: 80
