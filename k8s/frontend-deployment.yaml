@@ -31,3 +31,6 @@ spec:
           env:
             - name: VITE_API_URL
               value: "http://ssgwoo-backend.ssgwoo-backend.svc.cluster.local"
+          envFrom:
+            - configMapRef:
+                name: frontend-config
