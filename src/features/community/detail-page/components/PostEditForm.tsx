@@ -1,5 +1,4 @@
 import type { Post } from '../../../../stores/post'
-import { usePosts } from '../../../../stores/post'
 
 interface PostEditFormProps {
   post: Post
@@ -8,23 +7,16 @@ interface PostEditFormProps {
 }
 
 export function PostEditForm({ post, onFinish, onCancel }: PostEditFormProps) {
-  const editPost = usePosts((state) => state.editPost)
-
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     const title = (document.querySelector('input') as HTMLInputElement).value
     const content = (document.querySelector('textarea') as HTMLTextAreaElement).value
     
-    try {
-      const success = await editPost(post.id, { title, content })
-      if (success) {
-        onFinish(title, content)
-      } else {
-        alert('게시글 수정에 실패했습니다.')
-      }
-    } catch (error) {
-      console.error('게시글 수정 실패:', error)
-      alert('게시글 수정에 실패했습니다.')
+    if (!title.trim() || !content.trim()) {
+      alert('제목과 내용을 입력해주세요.')
+      return
     }
+    
+    onFinish(title, content)
   }
 
   return (
