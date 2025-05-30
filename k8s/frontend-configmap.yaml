@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-config
+  namespace: ssgwoo-frontend
+data:
+  VITE_API_URL: "http://ssgwoo-backend.ssgwoo-backend.svc.cluster.local" 

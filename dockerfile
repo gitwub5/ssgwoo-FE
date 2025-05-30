@@ -4,6 +4,11 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
+
+# 빌드 시점에 환경변수 주입
+ARG VITE_API_URL
+ENV VITE_API_URL=${VITE_API_URL}
+
 RUN npm run build
 
 # 2. Production 단계
