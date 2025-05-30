@@ -1,0 +1,40 @@
+name: Deploy to Mini PC
+
+on:
+  push:
+    branches:
+      - deploy
+
+jobs:
+  deploy:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/web-server:latest
+
+      - name: Deploy to Mini PC
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.MINI_PC_HOST }}
+          username: ${{ secrets.MINI_PC_USERNAME }}
+          key: ${{ secrets.MINI_PC_SSH_KEY }}
+          script: |
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/web-server:latest
+            docker stop web-server || true
+            docker rm web-server || true
+            docker run -d --name web-server -p 80:80 ${{ secrets.DOCKERHUB_USERNAME }}/web-server:latest 
