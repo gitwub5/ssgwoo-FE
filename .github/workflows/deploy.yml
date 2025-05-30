@@ -1,40 +1,77 @@
-name: Deploy to Mini PC
+name: Build and Deploy
 
 on:
   push:
     branches:
       - deploy
 
+env:
+  REGISTRY: docker.io
+  IMAGE_NAME: ssgwoo/ssgwoo-frontend
+  DEPLOY_YAML_PATH: k8s/frontend-deployment.yaml
+
 jobs:
-  deploy:
+  build-and-push:
+    name: Build and Push Docker Image
     runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      packages: write
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Login to Docker Hub
+      - name: Log in to DockerHub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push Docker image
+      - name: Extract metadata (image tags, labels)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha,format=short,prefix=v
+            type=ref,event=branch,prefix=v
+            latest
+
+      - name: Build and Push Docker Image
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/web-server:latest
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
-      - name: Deploy to Mini PC
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.MINI_PC_HOST }}
-          username: ${{ secrets.MINI_PC_USERNAME }}
-          key: ${{ secrets.MINI_PC_SSH_KEY }}
-          script: |
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/web-server:latest
-            docker stop web-server || true
-            docker rm web-server || true
-            docker run -d --name web-server -p 80:80 ${{ secrets.DOCKERHUB_USERNAME }}/web-server:latest 
+  update-deployment:
+    name: Update K8s YAML and Commit
+    needs: build-and-push
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Update image tag in YAML
+        run: |
+          TAG=${{ steps.meta.outputs.version }}
+          echo "Updating image tag to: $TAG"
+          sed -i "s|\(image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:\).*|\1$TAG|" ${{ env.DEPLOY_YAML_PATH }}
+
+      - name: Commit and push updated YAML
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add ${{ env.DEPLOY_YAML_PATH }}
+          git commit -m "ci: update image tag to $TAG" || echo "No changes to commit"
+          git push
