@@ -9,6 +9,7 @@ env:
   REGISTRY: docker.io
   IMAGE_NAME: ssgwoo/ssgwoo-frontend
   DEPLOY_YAML_PATH: k8s/frontend-deployment.yaml
+  VITE_API_URL: "http://ssgwoo-backend.ssgwoo-backend.svc.cluster.local"
 
 jobs:
   build-and-push:
@@ -53,6 +54,8 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          build-args: |
+            VITE_API_URL=${{ env.VITE_API_URL }}
 
   update-deployment:
     name: Update K8s YAML and Commit
