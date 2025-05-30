@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ssgwoo-frontend
+  labels:
+    app: ssgwoo-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ssgwoo-frontend
+  template:
+    metadata:
+      labels:
+        app: ssgwoo-frontend
+    spec:
+      containers:
+        - name: frontend
+          image: docker.io/ssgwoo/ssgwoo-frontend:vlatest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "64Mi"
+            limits:
+              cpu: "250m"
+              memory: "256Mi"
+          env:
+            - name: VITE_API_URL
+              value: "http://ssgwoo-backend.ssgwoo-backend.svc.cluster.local"
