@@ -67,7 +67,7 @@ jobs:
 
       - name: Update image tag in YAML
         run: |
-          TAG: ${{ needs.build-and-push.outputs.image_tag }}
+          TAG=${{ needs.build-and-push.outputs.image_tag }}
           echo "Updating image tag to: $TAG"
           sed -i "s|\(image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:\).*|\1$TAG|" ${{ env.DEPLOY_YAML_PATH }}
 
