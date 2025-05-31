@@ -31,8 +31,8 @@ export function CommentItem({
       const success = await editComment(comment.postId, comment.id, editingContent)
       if (success) {
         onFinishEdit()
-      } else {
-        alert('댓글 수정에 실패했습니다.')
+        // 성공 메시지 추가
+        alert('댓글이 수정되었습니다.')
       }
     } catch (error) {
       console.error('댓글 수정 실패:', error)

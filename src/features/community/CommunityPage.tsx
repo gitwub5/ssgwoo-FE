@@ -147,11 +147,11 @@ export function CommunityPage() {
             <div className="flex gap-3">
               <span className="flex items-center gap-1 hover:text-pink-500 transition-colors duration-300">
                 <span className="text-sm">❤️</span>
-                <span>{post.likes}</span>
+                <span>{post.likesCount}</span>
               </span>
               <span className="flex items-center gap-1 hover:text-blue-500 transition-colors duration-300">
                 <span className="text-sm">💬</span>
-                <span>{post.comments?.length ?? 0}</span>
+                <span>{post.commentsCount}</span>
               </span>
             </div>
           </div>
