@@ -62,6 +62,10 @@ const verifyCommentPassword = useComments((state) => state.verifyCommentPassword
     // 좋아요를 누르지 않은 경우에만 좋아요 추가
     sessionStorage.setItem('likedPosts', JSON.stringify([...likedPosts, postId]))
     setHasLiked(true)
+    // 게시글 상태도 즉시 업데이트
+    if (post) {
+      setPost({ ...post, likesCount: post.likesCount + 1 })
+    }
     addLike(postId)
   }
 
@@ -81,12 +85,21 @@ const verifyCommentPassword = useComments((state) => state.verifyCommentPassword
     }
     try {
       await addComment(postId, { nickname, password, content })
-      const fetched = await getPostById(postId)
-      setPost(fetched ?? null)
+      // 댓글 작성 성공 후 입력 필드 초기화
       setNickname('')
       setPassword('')
       setContent('')
-    } catch {
+      
+      // 게시글 다시 불러오기 시도
+      try {
+        const fetched = await getPostById(postId)
+        setPost(fetched ?? null)
+      } catch (error) {
+        console.error('게시글 새로고침 실패:', error)
+        // 게시글 새로고침 실패는 사용자에게 알리지 않음
+      }
+    } catch (error) {
+      console.error('댓글 작성 실패:', error)
       alert('댓글 작성에 실패했습니다.')
     }
   }
@@ -123,7 +136,7 @@ const verifyCommentPassword = useComments((state) => state.verifyCommentPassword
       const updatedPost = await getPostById(postId)
       setPost(updatedPost)
       setEditingPost(false)
-      alert('수정되었습니다.')
+      alert('게시글이 수정되었습니다.')
     } catch (error) {
       console.error('게시글 수정 실패:', error)
       alert('게시글 수정에 실패했습니다.')
@@ -144,7 +157,6 @@ const verifyCommentPassword = useComments((state) => state.verifyCommentPassword
     }
     const success = await editComment(postId, commentId, editingCommentContent)
     if (success) {
-      alert('수정되었습니다.')
       setEditingCommentId(null)
       setEditingCommentContent('')
     } else {
@@ -153,12 +165,15 @@ const verifyCommentPassword = useComments((state) => state.verifyCommentPassword
   }
 
   // 댓글 삭제
-  async function handleDeleteComment(commentId: number) {
+  const handleDeleteComment = async (commentId: number) => {
     const success = await deleteComment(postId, commentId)
     if (success) {
+      // 게시글 다시 불러오기
+      const updatedPost = await getPostById(postId)
+      setPost(updatedPost)
       alert('댓글이 삭제되었습니다.')
     } else {
-      alert('비밀번호가 일치하지 않습니다.')
+      alert('댓글 삭제에 실패했습니다.')
     }
     setPwModal({ open: false, type: null })
   }
@@ -262,7 +277,7 @@ const handlePasswordSubmit = async (pw: string) => {
             }`}
           >
             <span className="text-base">♥</span>
-            <span>{post.likes}</span>
+            <span>{post.likesCount}</span>
           </button>
           <div className="flex items-center gap-1">
             <span className="text-base">💬</span>
