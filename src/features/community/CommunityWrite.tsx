@@ -18,7 +18,7 @@ export function CommunityWrite() {
       return
     }
     try {
-      await addPost({ title, nickname, password, content, createdAt: new Date().toISOString() })
+      await addPost({ title, nickname, password, content, createdAt: new Date().toISOString(), likesCount: 0, commentsCount: 0 })
       await getPostList(5, 0) // 최신 게시글 목록을 다시 불러옵니다
       navigate('/community', { replace: true })
     } catch (error) {
