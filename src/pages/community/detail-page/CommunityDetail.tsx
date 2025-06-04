@@ -2,6 +2,7 @@ import { Link, useParams, useNavigate } from 'react-router-dom'
 import { usePosts } from '../../../stores/post'
 import { useComments } from '../../../stores/post'
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import PasswordModal from './components/PasswordModal'
 import { PostEditForm } from './components/PostEditForm'
 import { CommentList } from './components/CommentList'
@@ -10,6 +11,7 @@ import { getRandomGradient } from '../../../shared/utils/GetRandomGradient'
 import type { Post } from '../../../stores/post'
 
 export function CommunityDetail() {
+  const { t } = useTranslation()
   const { id } = useParams()
   const postId = Number(id)
   const addComment = useComments((state) => state.addComment)
@@ -70,37 +72,34 @@ const verifyCommentPassword = useComments((state) => state.verifyCommentPassword
   }
 
   if (loading) {
-    return <div>로딩 중...</div>
+    return <div>{t('communityPage.detailPage.loading')}</div>
   }
 
   if (!post) {
-    return <div>글을 찾을 수 없습니다.</div>
+    return <div>{t('communityPage.detailPage.notFound')}</div>
   }
 
   async function handleCommentSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!nickname.trim() || !password.trim() || !content.trim()) {
-      alert('닉네임, 비밀번호, 내용을 모두 입력해주세요.')
+      alert(t('communityPage.detailPage.comment.error.required'))
       return
     }
     try {
       await addComment(postId, { nickname, password, content })
-      // 댓글 작성 성공 후 입력 필드 초기화
       setNickname('')
       setPassword('')
       setContent('')
       
-      // 게시글 다시 불러오기 시도
       try {
         const fetched = await getPostById(postId)
         setPost(fetched ?? null)
       } catch (error) {
         console.error('게시글 새로고침 실패:', error)
-        // 게시글 새로고침 실패는 사용자에게 알리지 않음
       }
     } catch (error) {
       console.error('댓글 작성 실패:', error)
-      alert('댓글 작성에 실패했습니다.')
+      alert(t('communityPage.detailPage.comment.error.submitFailed'))
     }
   }
 
@@ -108,11 +107,11 @@ const verifyCommentPassword = useComments((state) => state.verifyCommentPassword
   async function handleDeletePost() {
     try {
       await deletePost(postId)
-      alert('삭제되었습니다.')
+      alert(t('communityPage.detailPage.deleteSuccess'))
       navigate('/community')
     } catch (error) {
       console.error('게시글 삭제 실패:', error)
-      alert('게시글 삭제에 실패했습니다.')
+      alert(t('communityPage.detailPage.error.deleteFailed'))
     }
     setPwModal({ open: false, type: null })
   }
@@ -128,7 +127,7 @@ const verifyCommentPassword = useComments((state) => state.verifyCommentPassword
   async function handleFinishEditPost(title: string, content: string) {
     if (!post) return
     if (!title.trim() || !content.trim()) {
-      alert('제목과 내용을 입력해주세요.')
+      alert(t('communityPage.detailPage.error.required'))
       return
     }
     try {
@@ -136,10 +135,10 @@ const verifyCommentPassword = useComments((state) => state.verifyCommentPassword
       const updatedPost = await getPostById(postId)
       setPost(updatedPost)
       setEditingPost(false)
-      alert('게시글이 수정되었습니다.')
+      alert(t('communityPage.detailPage.editSuccess'))
     } catch (error) {
       console.error('게시글 수정 실패:', error)
-      alert('게시글 수정에 실패했습니다.')
+      alert(t('communityPage.detailPage.error.editFailed'))
     }
   }
 
@@ -152,7 +151,7 @@ const verifyCommentPassword = useComments((state) => state.verifyCommentPassword
   // 댓글 수정 완료
   async function handleFinishEditComment(commentId: number) {
     if (!editingCommentContent.trim()) {
-      alert('내용을 입력해주세요.')
+      alert(t('communityPage.detailPage.error.required'))
       return
     }
     const success = await editComment(postId, commentId, editingCommentContent)
@@ -160,7 +159,7 @@ const verifyCommentPassword = useComments((state) => state.verifyCommentPassword
       setEditingCommentId(null)
       setEditingCommentContent('')
     } else {
-      alert('비밀번호가 일치하지 않습니다.')
+      alert(t('communityPage.detailPage.comment.error.invalidPassword'))
     }
   }
 
@@ -171,9 +170,9 @@ const verifyCommentPassword = useComments((state) => state.verifyCommentPassword
       // 게시글 다시 불러오기
       const updatedPost = await getPostById(postId)
       setPost(updatedPost)
-      alert('댓글이 삭제되었습니다.')
+      alert(t('communityPage.detailPage.comment.deleteSuccess'))
     } else {
-      alert('댓글 삭제에 실패했습니다.')
+      alert(t('communityPage.detailPage.comment.error.deleteFailed'))
     }
     setPwModal({ open: false, type: null })
   }
@@ -183,7 +182,7 @@ const handlePasswordSubmit = async (pw: string) => {
   if (pwModal.type === 'post-edit') {
     const ok = await verifyPostPassword(postId, pw)
     if (!ok) {
-      alert('게시글 비밀번호가 일치하지 않습니다.')
+      alert(t('communityPage.detailPage.error.invalidPassword'))
       setPwModal({ open: false, type: null })
       return
     }
@@ -191,7 +190,7 @@ const handlePasswordSubmit = async (pw: string) => {
   } else if (pwModal.type === 'post-delete') {
     const ok = await verifyPostPassword(postId, pw)
     if (!ok) {
-      alert('게시글 비밀번호가 일치하지 않습니다.')
+      alert(t('communityPage.detailPage.error.invalidPassword'))
       setPwModal({ open: false, type: null })
       return
     }
@@ -199,7 +198,7 @@ const handlePasswordSubmit = async (pw: string) => {
   } else if (pwModal.type === 'comment-edit' && pwModal.targetId) {
     const ok = await verifyCommentPassword(postId, pwModal.targetId, pw)
     if (!ok) {
-      alert('댓글 비밀번호가 일치하지 않습니다.')
+      alert(t('communityPage.detailPage.comment.error.invalidPassword'))
       setPwModal({ open: false, type: null })
       return
     }
@@ -207,7 +206,7 @@ const handlePasswordSubmit = async (pw: string) => {
   } else if (pwModal.type === 'comment-delete' && pwModal.targetId) {
     const ok = await verifyCommentPassword(postId, pwModal.targetId, pw)
     if (!ok) {
-      alert('댓글 비밀번호가 일치하지 않습니다.')
+      alert(t('communityPage.detailPage.comment.error.invalidPassword'))
       setPwModal({ open: false, type: null })
       return
     }
@@ -222,10 +221,10 @@ const handlePasswordSubmit = async (pw: string) => {
         open={pwModal.open}
         onClose={() => setPwModal({ open: false, type: null })}
         label={
-          pwModal.type === 'post-edit' ? '게시글 수정 비밀번호'
-          : pwModal.type === 'post-delete' ? '게시글 삭제 비밀번호'
-          : pwModal.type === 'comment-edit' ? '댓글 수정 비밀번호'
-          : pwModal.type === 'comment-delete' ? '댓글 삭제 비밀번호'
+          pwModal.type === 'post-edit' ? t('communityPage.detailPage.passwordModal.edit')
+          : pwModal.type === 'post-delete' ? t('communityPage.detailPage.passwordModal.delete')
+          : pwModal.type === 'comment-edit' ? t('communityPage.detailPage.comment.passwordModal.edit')
+          : pwModal.type === 'comment-delete' ? t('communityPage.detailPage.comment.passwordModal.delete')
           : ''
         }
         type={pwModal.type === 'post-edit' || pwModal.type === 'post-delete' ? 'post' : 'comment'}
@@ -242,8 +241,12 @@ const handlePasswordSubmit = async (pw: string) => {
             <button onClick={() => setOpenPostMenu((v) => !v)} className="px-2 py-1 text-gray-500 hover:text-gray-900 text-xl">⋮</button>
             {openPostMenu && (
               <div className="absolute right-0 mt-2 w-24 bg-white border rounded shadow z-10">
-                <button onClick={() => { setOpenPostMenu(false); setPwModal({ open: true, type: 'post-edit' }); }} className="block w-full px-4 py-2 text-left hover:bg-gray-100">수정</button>
-                <button onClick={() => { setOpenPostMenu(false); setPwModal({ open: true, type: 'post-delete' }); }} className="block w-full px-4 py-2 text-left text-red-500 hover:bg-gray-100">삭제</button>
+                <button onClick={() => { setOpenPostMenu(false); setPwModal({ open: true, type: 'post-edit' }); }} className="block w-full px-4 py-2 text-left hover:bg-gray-100">
+                  {t('communityPage.detailPage.edit')}
+                </button>
+                <button onClick={() => { setOpenPostMenu(false); setPwModal({ open: true, type: 'post-delete' }); }} className="block w-full px-4 py-2 text-left text-red-500 hover:bg-gray-100">
+                  {t('communityPage.detailPage.delete')}
+                </button>
               </div>
             )}
           </div>
@@ -315,7 +318,9 @@ const handlePasswordSubmit = async (pw: string) => {
           onContentChange={setContent}
           onSubmit={handleCommentSubmit}
         />
-        <Link to="/community" className="block text-center mt-4 px-6 py-2 bg-gray-100 text-gray-700 rounded-full font-bold shadow hover:bg-gray-200 transition">목록으로</Link>
+        <Link to="/community" className="block text-center mt-4 px-6 py-2 bg-gray-100 text-gray-700 rounded-full font-bold shadow hover:bg-gray-200 transition">
+          {t('communityPage.detailPage.goToList')}
+        </Link>
       </div>
     </div>
   )

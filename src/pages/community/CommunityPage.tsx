@@ -3,8 +3,10 @@ import { usePosts } from '../../stores/post'
 import { getRandomGradient } from '../../shared/utils/GetRandomGradient'
 import { useEffect, useRef, useState } from 'react'
 import type { Post } from '../../stores/post'
+import { useTranslation } from 'react-i18next'
 
 export function CommunityPage() {
+  const { t } = useTranslation()
   const getPostList = usePosts((state) => state.getPostList)
   const [posts, setPosts] = useState<Post[]>([])
   const [nextCursor, setNextCursor] = useState<number | null>(null)
@@ -97,26 +99,26 @@ export function CommunityPage() {
   return (
     <div className="max-w-md mx-auto flex flex-col gap-4 relative">
       <div className="flex justify-between items-center mb-0">
-        <h1 className="text-2xl font-bold text-gray-900">커뮤니티</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{t('communityPage.title')}</h1>
         <div className="flex gap-2">
           <Link
             to="/community/rules"
             className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg font-medium hover:bg-gray-200 transition text-sm shadow-md hover:shadow-lg active:shadow-sm active:translate-y-0.5"
           >
-            커뮤니티 규칙
+            {t('communityPage.rules')}
           </Link>
           <Link
             to="/community/write"
             className="bg-blue-500 text-white px-3 py-1.5 rounded-lg font-medium hover:bg-blue-600 transition text-sm shadow-md hover:shadow-lg active:shadow-sm active:translate-y-0.5"
           >
-            게시글 작성
+            {t('communityPage.write')}
           </Link>
         </div>
       </div>
       {posts.length === 0 && !isLoading && (
         <div className="text-center py-6 text-gray-500 bg-white rounded-2xl shadow-md">
-          <p className="text-lg mb-1">아직 게시글이 없습니다.</p>
-          <p className="text-sm">첫 번째 게시글을 작성해보세요!</p>
+          <p className="text-lg mb-1">{t('communityPage.noPosts.title')}</p>
+          <p className="text-sm">{t('communityPage.noPosts.subtitle')}</p>
         </div>
       )}
       {posts.map((post, index) => (
@@ -163,7 +165,7 @@ export function CommunityPage() {
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
           </svg>
-          <span className="ml-2 text-sm text-gray-500">불러오는 중...</span>
+          <span className="ml-2 text-sm text-gray-500">{t('communityPage.loading')}</span>
         </div>
       )}
     </div>

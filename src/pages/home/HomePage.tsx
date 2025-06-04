@@ -56,7 +56,7 @@ export function HomePage() {
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
-          {t('welcomeTo')}{' '}
+          {t('Welcome to')}{' '}
           <span 
             className={`inline-block transition-all duration-300 ${isHovered ? 'text-blue-600 dark:text-blue-400 scale-110' : 'text-blue-600 dark:text-blue-400'}`}
           >
@@ -64,15 +64,15 @@ export function HomePage() {
           </span>
         </h1>
         <p className={`text-lg md:text-2xl text-gray-700 dark:text-gray-300 mb-8 font-medium max-w-2xl ${isVisible ? 'animate-fade-in [animation-delay:200ms]' : 'opacity-0'}`}>
-          {t('platform')}<br />
-          {t('platformDesc')}
+          {t('homePage.platform')}<br />
+          {t('homePage.platformDesc')}
         </p>
         <div className={`flex gap-4 ${isVisible ? 'animate-fade-in [animation-delay:400ms]' : 'opacity-0'}`}>
           <Link 
             to="/about" 
             className="group relative px-8 py-3 rounded-full bg-white dark:bg-gray-800 border border-blue-600 dark:border-blue-400 text-blue-600 dark:text-blue-400 font-bold text-lg shadow hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
           >
-            <span className="relative z-10">{t('aboutMeBtn')}</span>
+            <span className="relative z-10">About me</span>
             <div className="absolute inset-0 rounded-full bg-blue-600 dark:bg-blue-400 opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
           </Link>
         </div>
