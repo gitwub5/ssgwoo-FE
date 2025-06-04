@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import type { Comment } from '../../../../stores/post'
 import { CommentItem } from './CommentItem'
 
@@ -22,10 +23,11 @@ export function CommentList({
   onFinishEdit,
   onCancelEdit,
 }: CommentListProps) {
+  const { t } = useTranslation();
   return (
     <div className="mb-6">
-      <h3 className="font-bold text-gray-800 mb-2">댓글</h3>
-      {comments.length === 0 && <div className="text-gray-400 text-sm">아직 댓글이 없습니다.</div>}
+      <h3 className="font-bold text-gray-800 mb-2">{t('communityPage.detailPage.comment.title')}</h3>
+      {comments.length === 0 && <div className="text-gray-400 text-sm">{t('communityPage.detailPage.comment.noComments')}</div>}
       <ul className="space-y-3">
         {comments.map((comment) => (
           <CommentItem

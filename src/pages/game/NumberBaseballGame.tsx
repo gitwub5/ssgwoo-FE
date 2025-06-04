@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 function generateAnswer() {
   const digits: number[] = [];
@@ -35,6 +36,7 @@ function DotRow({ label, count, color, max = 3 }: { label: string; count: number
 }
 
 export function NumberBaseballGame() {
+  const { t } = useTranslation();
   const [answer] = useState(() => generateAnswer());
   const [input, setInput] = useState("");
   const [history, setHistory] = useState<{ guess: string; result: string; strike: number; ball: number }[]>([]);
@@ -49,18 +51,18 @@ export function NumberBaseballGame() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (input.length !== 3 || new Set(input).size !== 3 || /[^1-9]/.test(input)) {
-      setMessage("1~9까지 서로 다른 숫자 3자리를 입력하세요.");
+      setMessage(t('numberBaseball.invalidInput'));
       return;
     }
     const guess = input.split("").map(Number);
     const { strike, ball } = checkGuess(answer, guess);
     setCurrentSB({ strike, ball });
-    const result = `${strike}S ${ball}B`;
+    const result = `${strike}${t('gamePage.numberBaseball.strike')} ${ball}${t('gamePage.numberBaseball.ball')}`;
     setHistory((h) => [...h, { guess: input, result, strike, ball }]);
     setInput("");
     setMessage("");
     if (strike === 3) {
-      setMessage(`정답! 축하합니다! (정답: ${answer.join("")})`);
+      setMessage(t('gamePage.numberBaseball.correct', { answer: answer.join("") }));
       setFinished(true);
     }
   };
@@ -74,13 +76,13 @@ export function NumberBaseballGame() {
 
   return (
     <div className="bg-white rounded shadow p-6 max-w-md mx-auto mt-10">
-      <h1 className="text-2xl font-bold mb-6 text-gray-900 text-center">숫자야구 게임</h1>
+      <h1 className="text-2xl font-bold mb-6 text-gray-900 text-center">{t('gamePage.numberBaseball.title')}</h1>
       {/* 전광판 부분 */}
       <div className="flex justify-center mb-8">
         <div className="bg-black border-2 border-white rounded-xl px-8 py-4 flex flex-col gap-1 items-center">
-          <DotRow label="S" count={currentSB.strike} color="bg-yellow-300" />
-          <DotRow label="B" count={currentSB.ball} color="bg-green-500" />
-          <DotRow label="O" count={outCount} color="bg-red-500" />
+          <DotRow label={t('gamePage.numberBaseball.strike')} count={currentSB.strike} color="bg-yellow-300" />
+          <DotRow label={t('gamePage.numberBaseball.ball')} count={currentSB.ball} color="bg-green-500" />
+          <DotRow label={t('gamePage.numberBaseball.out')} count={outCount} color="bg-red-500" />
         </div>
       </div>
       <form onSubmit={handleSubmit} className="flex gap-2 mb-4" autoComplete="off">
@@ -90,12 +92,12 @@ export function NumberBaseballGame() {
           value={input}
           onChange={handleChange}
           className="border px-3 py-2 rounded w-32"
-          placeholder="예: 123"
+          placeholder={t('gamePage.numberBaseball.inputPlaceholder')}
           disabled={finished}
           required
         />
         <button className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition" disabled={finished}>
-          확인
+          {t('gamePage.numberBaseball.submit')}
         </button>
       </form>
       {message && <div className="mb-2 text-lg font-semibold text-blue-400">{message}</div>}
@@ -105,7 +107,9 @@ export function NumberBaseballGame() {
         ))}
       </ul>
       {finished && (
-        <button onClick={handleRestart} className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 transition">다시 시작</button>
+        <button onClick={handleRestart} className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 transition">
+          {t('gamePage.numberBaseball.restart')}
+        </button>
       )}
     </div>
   );

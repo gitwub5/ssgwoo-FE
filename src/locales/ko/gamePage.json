@@ -1,0 +1,21 @@
+{
+  "numberBaseball": {
+    "title": "숫자야구 게임",
+    "inputPlaceholder": "예: 123",
+    "submit": "확인",
+    "restart": "다시 시작",
+    "correct": "정답! 축하합니다! (정답: {{answer}})",
+    "invalidInput": "1~9까지 서로 다른 숫자 3자리를 입력하세요.",
+    "strike": "S",
+    "ball": "B",
+    "out": "O"
+  },
+  "numberGuess": {
+    "title": "숫자 맞추기 게임",
+    "inputPlaceholder": "1~100",
+    "submit": "확인",
+    "correct": "정답입니다! 시도 횟수: {{count}}",
+    "up": "UP",
+    "down": "DOWN"
+  }
+} 
