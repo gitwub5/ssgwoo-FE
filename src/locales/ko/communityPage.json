@@ -1,0 +1,109 @@
+{
+  "title": "커뮤니티",
+  "rules": "커뮤니티 규칙",
+  "write": "게시글 작성",
+  "noPosts": {
+    "title": "아직 게시글이 없습니다.",
+    "subtitle": "첫 번째 게시글을 작성해보세요!"
+  },
+  "loading": "불러오는 중...",
+  "back": "← 돌아가기",
+  "rulesPage": {
+    "title": "커뮤니티 규칙",
+    "basic": {
+      "title": "1. 기본 규칙",
+      "items": [
+        "서로를 존중하고 예의를 지켜주세요.",
+        "타인의 권리를 침해하는 행위는 금지됩니다.",
+        "욕설, 비방, 혐오 발언은 금지됩니다."
+      ]
+    },
+    "post": {
+      "title": "2. 게시글 작성 규칙",
+      "items": [
+        "제목은 내용을 잘 설명할 수 있도록 작성해주세요.",
+        "스팸성 게시글은 금지됩니다.",
+        "광고성 게시글은 사전 허가 없이 금지됩니다.",
+        "저작권이 있는 콘텐츠는 출처를 명시해주세요."
+      ]
+    },
+    "comment": {
+      "title": "3. 댓글 작성 규칙",
+      "items": [
+        "댓글은 주제와 관련된 내용으로 작성해주세요.",
+        "타인을 비방하거나 모욕하는 댓글은 금지됩니다.",
+        "도배성 댓글은 제한될 수 있습니다."
+      ]
+    },
+    "penalty": {
+      "title": "4. 제재 규정",
+      "items": [
+        "규칙 위반 시 해당 게시글 또는 댓글은 즉각 삭제 조치가 이루어집니다.",
+        "반복적인 위반 시 영구적인 이용 제한이 될 수 있습니다."
+      ]
+    },
+    "notice": "커뮤니티 규칙은 모든 회원이 더 나은 환경에서 소통할 수 있도록 마련되었습니다. 규칙을 준수하여 즐거운 커뮤니티 활동이 되시길 바랍니다."
+  },
+  "writePage": {
+    "title": "새 글 작성",
+    "form": {
+      "title": "제목",
+      "titlePlaceholder": "제목을 입력해주세요",
+      "nickname": "닉네임",
+      "nicknamePlaceholder": "닉네임을 입력해주세요",
+      "content": "내용",
+      "contentPlaceholder": "내용을 입력해주세요",
+      "password": "비밀번호",
+      "passwordPlaceholder": "숫자 4자리",
+      "passwordHelp": "* 게시글 수정/삭제 시 필요합니다",
+      "cancel": "취소",
+      "submit": "작성하기"
+    },
+    "error": {
+      "invalidPassword": "비밀번호는 숫자 4자리여야 합니다."
+    }
+  },
+  "detailPage": {
+    "goToList": "목록으로",
+    "edit": "수정",
+    "delete": "삭제",
+    "confirmDelete": "정말로 삭제하시겠습니까?",
+    "deleteSuccess": "게시글 삭제 완료",
+    "submit": "확인",
+    "cancel": "취소",
+    "error": {
+      "invalidPassword": "비밀번호가 일치하지 않습니다.",
+      "deleteFailed": "삭제에 실패했습니다.",
+      "editFailed": "수정에 실패했습니다."
+    },
+    "comment": {
+      "title": "댓글",
+      "noComments": "아직 댓글이 없습니다.",
+      "nickname": "닉네임",
+      "placeholder": "댓글을 입력하세요...",
+      "submit": "작성",
+      "edit": "수정",
+      "delete": "삭제",
+      "password": "비밀번호",
+      "passwordPlaceholder": "숫자 4자리",
+      "passwordModal": {
+        "edit": "댓글 수정 비밀번호",
+        "delete": "댓글 삭제 비밀번호"
+      },
+      "error": {
+        "invalidPassword": "비밀번호가 일치하지 않습니다.",
+        "deleteFailed": "댓글 삭제에 실패했습니다.",
+        "editFailed": "댓글 수정에 실패했습니다."
+      }
+    },
+    "passwordModal": {
+      "edit": "게시글 수정 비밀번호",
+      "delete": "게시글 삭제 비밀번호",
+      "placeholder": "비밀번호(숫자 4자리)"
+    },
+    "like": {
+      "add": "좋아요",
+      "remove": "좋아요 취소"
+    }
+  }
+} 

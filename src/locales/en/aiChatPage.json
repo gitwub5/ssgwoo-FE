@@ -1,0 +1,7 @@
+{
+  "title": "AI Chat",
+  "placeholder": "Type a message...",
+  "send": "Send",
+  "emptyMessage": "Type a message to start!",
+  "unavailable": "This feature is currently unavailable."
+} 

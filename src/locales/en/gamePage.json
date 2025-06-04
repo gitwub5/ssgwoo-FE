@@ -1,0 +1,21 @@
+{
+  "numberBaseball": {
+    "title": "Number Baseball Game",
+    "inputPlaceholder": "ex: 123",
+    "submit": "Submit",
+    "restart": "Restart",
+    "correct": "Correct! Congratulations! (Answer: {{answer}})",
+    "invalidInput": "Please enter 3 different digits from 1 to 9.",
+    "strike": "S",
+    "ball": "B",
+    "out": "O"
+  },
+  "numberGuess": {
+    "title": "Number Guessing Game",
+    "inputPlaceholder": "1~100",
+    "submit": "Submit",
+    "correct": "Correct! Number of attempts: {{count}}",
+    "up": "UP",
+    "down": "DOWN"
+  }
+} 
