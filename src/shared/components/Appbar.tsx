@@ -3,7 +3,14 @@ import { useState } from 'react'
 import LanguageSwitcher from './LanguageSwitchBtn'
 // import { LightmodeSwitchBtn } from './LightmodeSwitchBtn'
 
-const appbarItems = [
+interface AppbarItem {
+  to: string
+  label: string
+  isSpecial?: boolean
+}
+
+const appbarItems: AppbarItem[] = [
+  { to: '/event', label: '🎂', isSpecial: true },
   { to: '/about', label: 'About' },
   { to: '/game', label: 'Game' },
   { to: '/ai', label: 'Ai Chat' },
@@ -27,7 +34,9 @@ export function Appbar() {
               key={item.to}
               to={item.to}
               className={`relative px-4 py-1 font-medium rounded transition text-gray-700 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/50
-                ${location.pathname.startsWith(item.to) ? 'text-blue-600 dark:text-blue-400 font-bold bg-blue-100 dark:bg-blue-900/30' : ''}`}
+                ${location.pathname.startsWith(item.to) ? 'text-blue-600 dark:text-blue-400 font-bold bg-blue-100 dark:bg-blue-900/30' : ''}
+                ${item.isSpecial ? 'text-2xl' : ''}`}
+              title={item.isSpecial ? '🎂 생일빵 때리기 게임' : item.label}
             >
               {item.label}
               <span className="absolute left-1/2 -bottom-1 w-0 h-0.5 bg-blue-400 transition-all group-hover:w-full" />
@@ -61,7 +70,8 @@ export function Appbar() {
                   key={item.to}
                   to={item.to}
                   className={`px-6 py-3 font-medium text-gray-700 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/50 transition
-                    ${location.pathname.startsWith(item.to) ? 'text-blue-600 dark:text-blue-400 font-bold bg-blue-100 dark:bg-blue-900/30' : ''}`}
+                    ${location.pathname.startsWith(item.to) ? 'text-blue-600 dark:text-blue-400 font-bold bg-blue-100 dark:bg-blue-900/30' : ''}
+                    ${item.isSpecial ? 'text-2xl text-center backdrop-blur-xl bg-gradient-to-br from-white/25 via-white/15 to-white/5 border border-white/40 dark:border-white/20 mx-4 my-3 rounded-3xl shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_8px_32px_rgba(147,51,234,0.2)] animate-pulse bg-gradient-to-br from-white/30 via-purple-100/20 to-pink-100/20 dark:from-white/20 dark:via-purple-900/30 dark:to-pink-900/30 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-transparent before:via-white/10 before:to-transparent before:animate-pulse' : ''}`}
                   onClick={() => setOpen(false)}
                 >
                   {item.label}

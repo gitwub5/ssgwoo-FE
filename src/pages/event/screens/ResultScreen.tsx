@@ -1,81 +1,90 @@
-import { useState } from 'react'
+import React from 'react'
+import type { ResultScreenProps } from '../../../stores/event'
+import { PixelSkyBackground } from './PixelSkyBackground'
 
-interface ResultScreenProps {
-  tapCount: number
-  onShowLeaderboard: () => void
-  onBackToStart: () => void
+export interface ResultScreenPropsWithMain extends Omit<ResultScreenProps, 'onRestart'> {
+  onGoToMain: () => void
+  isNicknameValid: boolean
+  nicknameError: string
+  isLoading?: boolean
+  error?: string | null
+  phoneNumber: string
+  onPhoneNumberChange: (phone: string) => void
+  phoneError?: string | null
 }
 
-export const ResultScreen = ({ tapCount, onShowLeaderboard, onBackToStart }: ResultScreenProps) => {
-  const [name, setName] = useState('')
-
-  const handleShare = async () => {
-    try {
-      await navigator.share({
-        title: '생일빵 게임 결과',
-        text: `제가 생일빵 게임에서 ${tapCount}회를 기록했어요! 도전해보세요!`,
-        url: window.location.href,
-      })
-    } catch (error: unknown) {
-      console.log('공유하기 실패:', error)
-      // 공유하기가 지원되지 않는 경우 클립보드에 복사
-      navigator.clipboard.writeText(window.location.href)
-      alert('링크가 클립보드에 복사되었습니다!')
-    }
-  }
-
-  const handleSubmit = () => {
-    if (name.trim()) {
-      // TODO: 랭킹 저장 로직 구현
-      onShowLeaderboard()
-    } else {
-      alert('이름을 입력해주세요!')
-    }
-  }
-
+export const ResultScreen: React.FC<ResultScreenPropsWithMain> = ({ 
+  score, 
+  nickname, 
+  phoneNumber,
+  onNicknameChange, 
+  onPhoneNumberChange,
+  onSubmitScore, 
+  onGoToMain, 
+  isNicknameValid, 
+  nicknameError,
+  isLoading = false,
+  error,
+  phoneError
+}) => {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4">
-      <h2 className="text-3xl font-bold text-pink-600 mb-8">게임 결과</h2>
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 pb-20 relative overflow-hidden">
+      <PixelSkyBackground />
       
-      <div className="text-center mb-12">
-        <p className="text-5xl font-bold text-gray-800 mb-4">{tapCount}회</p>
-        <p className="text-xl text-gray-600">축하합니다!</p>
-      </div>
-
-      <div className="w-full max-w-md mb-8">
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="이름을 입력하세요"
-          className="w-full px-4 py-2 border-2 border-pink-300 rounded-lg focus:outline-none focus:border-pink-500"
-        />
-      </div>
-
-      <div className="flex flex-col gap-4 w-full max-w-md">
-        <button
-          onClick={handleSubmit}
-          className="w-full px-6 py-3 bg-pink-500 text-white rounded-lg font-bold
-                   hover:bg-pink-600 transition-colors"
-        >
-          랭킹 등록하기
-        </button>
+      <div className="bg-white border-4 border-orange-400 rounded-none p-8 max-w-md mx-auto shadow-[4px_4px_0px_rgba(0,0,0,0.2)] relative z-10">
+        <h2 className="text-3xl font-bold text-center mb-4 pixel-font tracking-wider drop-shadow-[2px_2px_0px_rgba(0,0,0,0.3)]">게임 끝!</h2>
+        <div className="text-center mb-6">
+          <div className="text-5xl font-bold text-blue-600 mb-2 pixel-font drop-shadow-[2px_2px_0px_rgba(0,0,0,0.3)]">{score}점</div>
+          <p className="text-lg text-gray-600 pixel-font">최종 점수</p>
+        </div>
         
-        <button
-          onClick={handleShare}
-          className="w-full px-6 py-3 bg-white text-pink-500 border-2 border-pink-500
-                   rounded-lg font-bold hover:bg-pink-50 transition-colors"
-        >
-          공유하기
-        </button>
-
-        <button
-          onClick={onBackToStart}
-          className="w-full px-6 py-3 bg-gray-100 text-gray-600 rounded-lg font-bold
-                   hover:bg-gray-200 transition-colors"
-        >
-          다시하기
-        </button>
+        <div className="mb-6">
+          <label className="block text-lg font-bold mb-2 pixel-font">닉네임:</label>
+          <input
+            type="text"
+            value={nickname}
+            onChange={(e) => onNicknameChange(e.target.value)}
+            className="w-full p-3 border-4 border-gray-400 rounded-none text-lg pixel-font shadow-[2px_2px_0px_rgba(0,0,0,0.1)] focus:outline-none focus:border-blue-500"
+            placeholder="닉네임을 입력하세요"
+            maxLength={10}
+            disabled={isLoading}
+          />
+          <input
+            type="text"
+            value={phoneNumber}
+            onChange={(e) => onPhoneNumberChange(e.target.value)}
+            className="w-full p-3 border-4 border-gray-400 rounded-none text-lg pixel-font shadow-[2px_2px_0px_rgba(0,0,0,0.1)] focus:outline-none focus:border-blue-500 mt-3"
+            placeholder="01012345678(필수x)"
+            maxLength={15}
+            disabled={isLoading}
+          />
+          {nicknameError && (
+            <div className="text-red-500 text-sm mt-2 pixel-font">{nicknameError}</div>
+          )}
+          {phoneError && (
+            <div className="text-red-500 text-sm mt-2 pixel-font">{phoneError}</div>
+          )}
+          {error && (
+            <div className="text-red-500 text-sm mt-2 pixel-font">{error}</div>
+          )}
+        </div>
+        
+        <div className="flex flex-col gap-3">
+          <button
+            onClick={onSubmitScore}
+            className="bg-blue-400 hover:bg-blue-500 text-white font-bold py-3 px-6 border-4 border-blue-700 rounded-none text-xl transition-all shadow-[3px_3px_0px_rgba(0,0,0,0.2)] hover:shadow-[5px_5px_0px_rgba(0,0,0,0.2)] hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[0px] active:translate-y-[0px] active:shadow-[1px_1px_0px_rgba(0,0,0,0.2)] disabled:bg-gray-300 disabled:border-gray-400 disabled:text-gray-500 disabled:cursor-not-allowed"
+            disabled={!isNicknameValid || !!phoneError || isLoading}
+          >
+            {isLoading ? '등록 중...' : '등록하기'}
+          </button>
+          <button
+            onClick={onGoToMain}
+            className="bg-yellow-300 hover:bg-yellow-400 text-yellow-900 font-bold py-2 px-6 border-4 border-yellow-500 rounded-none text-lg transition-all shadow-[2px_2px_0px_rgba(0,0,0,0.15)] hover:shadow-[4px_4px_0px_rgba(0,0,0,0.15)] hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[0px] active:translate-y-[0px] active:shadow-[1px_1px_0px_rgba(0,0,0,0.15)]"
+            disabled={isLoading}
+          >
+            메인으로
+          </button>
+        </div>
       </div>
     </div>
   )
