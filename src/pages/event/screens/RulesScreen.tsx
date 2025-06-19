@@ -4,7 +4,7 @@ import { PixelSkyBackground } from './PixelSkyBackground'
 
 export const RulesScreen: React.FC<RulesScreenProps> = ({ onStartGame, onBackToMain }) => {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-start pt-8 p-4 relative overflow-hidden">
+    <div className="min-h-screen flex flex-col items-center justify-start pt-6 p-4 relative overflow-hidden">
       <PixelSkyBackground />
       <div className="bg-white border-4 border-blue-400 rounded-none p-6 max-w-md mx-auto shadow-[4px_4px_0px_rgba(0,0,0,0.2)] relative z-10">
         <h2 className="text-3xl font-bold text-center mb-4 pixel-font tracking-wider drop-shadow-[2px_2px_0px_rgba(0,0,0,0.3)]">게임 규칙</h2>
