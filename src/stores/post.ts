@@ -69,7 +69,6 @@ export const usePosts = create<PostStore>((set) => ({
       const response = await axios.get(`${API_BASE_URL}/api/v1/posts`, {
         params: { limit, cursor }
       })
-      console.log(response.data.data.posts)
       set({ posts: response.data.data.posts, loading: false })
       return response.data.data.posts
     } catch (err) {
