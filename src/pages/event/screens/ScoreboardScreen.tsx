@@ -9,6 +9,8 @@ interface ScoreboardScreenWithPagingProps extends ScoreboardScreenProps {
 }
 
 export const ScoreboardScreen: React.FC<ScoreboardScreenWithPagingProps> = ({ scores, onGoToMain, isLoading = false, totalPages, currentPage, onPageChange }) => {
+  const pageSize = 10;
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-2 relative overflow-hidden">
       <PixelSkyBackground />
@@ -25,15 +27,18 @@ export const ScoreboardScreen: React.FC<ScoreboardScreenWithPagingProps> = ({ sc
             <p className="text-center text-gray-500 text-base pixel-font">아직 기록이 없습니다!</p>
           ) : (
             <div className="space-y-2">
-              {scores.map((s, index) => (
-                <div key={index} className="flex justify-between items-center border-b-2 border-purple-200 pb-2 px-3">
-                  <div className="flex items-center flex-1">
-                    <span className="font-bold text-base mr-4 pixel-font min-w-[2.5rem]">#{index + 1}</span>
-                    <span className="text-base pixel-font flex-1">{s.nickname}</span>
+              {scores.map((s, index) => {
+                const rank = (currentPage - 1) * pageSize + index + 1;
+                return (
+                  <div key={index} className="flex justify-between items-center border-b-2 border-purple-200 pb-2 px-3">
+                    <div className="flex items-center flex-1">
+                      <span className="font-bold text-base mr-4 pixel-font min-w-[2.5rem]">#{rank}</span>
+                      <span className="text-base pixel-font flex-1">{s.nickname}</span>
+                    </div>
+                    <span className="font-bold text-lg text-blue-600 pixel-font drop-shadow-[1px_1px_0px_rgba(0,0,0,0.2)] min-w-[5rem] text-right">{s.score}점</span>
                   </div>
-                  <span className="font-bold text-lg text-blue-600 pixel-font drop-shadow-[1px_1px_0px_rgba(0,0,0,0.2)] min-w-[5rem] text-right">{s.score}점</span>
-                </div>
-              ))}
+                )
+              })}
             </div>
           )}
         </div>
@@ -41,16 +46,55 @@ export const ScoreboardScreen: React.FC<ScoreboardScreenWithPagingProps> = ({ sc
         {/* 페이지네이션 버튼 */}
         {totalPages > 1 && (
           <div className="flex justify-center gap-2 mb-4">
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-              <button
-                key={page}
-                onClick={() => onPageChange(page)}
-                className={`px-3 py-1 border-2 rounded-none pixel-font font-bold ${page === currentPage ? 'bg-purple-400 text-white border-purple-600' : 'bg-gray-100 border-purple-200 text-purple-700'} transition-all`}
-                disabled={isLoading || page === currentPage}
-              >
-                {page}
-              </button>
-            ))}
+            {
+              (() => {
+                const pages: number[] = [];
+                const first = 1;
+                const last = totalPages;
+                const prev = currentPage - 1;
+                const next = currentPage + 1;
+
+                // 항상 첫 페이지
+                pages.push(first);
+
+                // prev
+                if (prev > first && prev < last) pages.push(prev);
+                // current
+                if (currentPage !== first && currentPage !== last) pages.push(currentPage);
+                // next
+                if (next < last && next > first) pages.push(next);
+                // 항상 마지막 페이지
+                if (last !== first) pages.push(last);
+
+                // 중복 제거 및 오름차순 정렬
+                const uniquePages = Array.from(new Set(pages)).sort((a, b) => a - b);
+
+                // ...을 올바른 위치에 삽입
+                const result: (number | string)[] = [];
+                for (let i = 0; i < uniquePages.length; i++) {
+                  if (i > 0 && uniquePages[i] - uniquePages[i - 1] > 1) {
+                    result.push('ellipsis-' + i);
+                  }
+                  result.push(uniquePages[i]);
+                }
+
+                return result.map((page, idx) => {
+                  if (typeof page === 'string' && page.startsWith('ellipsis')) {
+                    return <span key={page + idx} className="px-2 text-gray-400">...</span>;
+                  }
+                  return (
+                    <button
+                      key={page}
+                      onClick={() => onPageChange(Number(page))}
+                      className={`px-3 py-1 border-2 rounded-none pixel-font font-bold ${page === currentPage ? 'bg-purple-400 text-white border-purple-600' : 'bg-gray-100 border-purple-200 text-purple-700'} transition-all`}
+                      disabled={isLoading || page === currentPage}
+                    >
+                      {page}
+                    </button>
+                  );
+                });
+              })()
+            }
           </div>
         )}
         
