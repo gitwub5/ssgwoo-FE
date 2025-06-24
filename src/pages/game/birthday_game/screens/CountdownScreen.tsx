@@ -1,5 +1,5 @@
 import React from 'react'
-import type { CountdownScreenProps } from '../../../stores/event'
+import type { CountdownScreenProps } from '../../../../stores/birthday'
 import { PixelSkyBackground } from './PixelSkyBackground'
 
 export const CountdownScreen: React.FC<CountdownScreenProps> = ({ countdown }) => {

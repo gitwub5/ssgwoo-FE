@@ -1,5 +1,5 @@
 import React from 'react'
-import type { InteractiveCharacterProps } from '../../../stores/event'
+import type { InteractiveCharacterProps } from '../../../../stores/birthday'
 
 const imageMap = {
   default: '/assets/character.png',

@@ -1,5 +1,5 @@
 import React from 'react'
-import type { ResultScreenProps } from '../../../stores/event'
+import type { ResultScreenProps } from '../../../../stores/birthday'
 import { PixelSkyBackground } from './PixelSkyBackground'
 
 export interface ResultScreenPropsWithMain extends Omit<ResultScreenProps, 'onRestart'> {
@@ -8,24 +8,18 @@ export interface ResultScreenPropsWithMain extends Omit<ResultScreenProps, 'onRe
   nicknameError: string
   isLoading?: boolean
   error?: string | null
-  phoneNumber: string
-  onPhoneNumberChange: (phone: string) => void
-  phoneError?: string | null
 }
 
 export const ResultScreen: React.FC<ResultScreenPropsWithMain> = ({ 
   score, 
   nickname, 
-  phoneNumber,
   onNicknameChange, 
-  onPhoneNumberChange,
   onSubmitScore, 
   onGoToMain, 
   isNicknameValid, 
   nicknameError,
   isLoading = false,
-  error,
-  phoneError
+  error
 }) => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 pb-20 relative overflow-hidden">
@@ -49,20 +43,8 @@ export const ResultScreen: React.FC<ResultScreenPropsWithMain> = ({
             maxLength={10}
             disabled={isLoading}
           />
-          <input
-            type="text"
-            value={phoneNumber}
-            onChange={(e) => onPhoneNumberChange(e.target.value)}
-            className="w-full p-3 border-4 border-gray-400 rounded-none text-lg pixel-font shadow-[2px_2px_0px_rgba(0,0,0,0.1)] focus:outline-none focus:border-blue-500 mt-3"
-            placeholder="01012345678(필수x)"
-            maxLength={15}
-            disabled={isLoading}
-          />
           {nicknameError && (
             <div className="text-red-500 text-sm mt-2 pixel-font">{nicknameError}</div>
-          )}
-          {phoneError && (
-            <div className="text-red-500 text-sm mt-2 pixel-font">{phoneError}</div>
           )}
           {error && (
             <div className="text-red-500 text-sm mt-2 pixel-font">{error}</div>
@@ -73,7 +55,7 @@ export const ResultScreen: React.FC<ResultScreenPropsWithMain> = ({
           <button
             onClick={onSubmitScore}
             className="bg-blue-400 hover:bg-blue-500 text-white font-bold py-3 px-6 border-4 border-blue-700 rounded-none text-xl transition-all shadow-[3px_3px_0px_rgba(0,0,0,0.2)] hover:shadow-[5px_5px_0px_rgba(0,0,0,0.2)] hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[0px] active:translate-y-[0px] active:shadow-[1px_1px_0px_rgba(0,0,0,0.2)] disabled:bg-gray-300 disabled:border-gray-400 disabled:text-gray-500 disabled:cursor-not-allowed"
-            disabled={!isNicknameValid || !!phoneError || isLoading}
+            disabled={!isNicknameValid || isLoading}
           >
             {isLoading ? '등록 중...' : '등록하기'}
           </button>

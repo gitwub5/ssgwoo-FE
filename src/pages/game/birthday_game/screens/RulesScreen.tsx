@@ -1,10 +1,10 @@
 import React from 'react'
-import type { RulesScreenProps } from '../../../stores/event'
+import type { RulesScreenProps } from '../../../../stores/birthday'
 import { PixelSkyBackground } from './PixelSkyBackground'
 
 export const RulesScreen: React.FC<RulesScreenProps> = ({ onStartGame, onBackToMain }) => {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-start pt-6 p-4 relative overflow-hidden">
+    <div className="min-h-screen flex flex-col items-center justify-start pt-8 p-8 relative overflow-hidden">
       <PixelSkyBackground />
       <div className="bg-white border-4 border-blue-400 rounded-none p-6 max-w-md mx-auto shadow-[4px_4px_0px_rgba(0,0,0,0.2)] relative z-10">
         <h2 className="text-3xl font-bold text-center mb-4 pixel-font tracking-wider drop-shadow-[2px_2px_0px_rgba(0,0,0,0.3)]">게임 규칙</h2>
@@ -23,12 +23,6 @@ export const RulesScreen: React.FC<RulesScreenProps> = ({ onStartGame, onBackToM
           <div>
             <h3 className="font-bold text-lg">목표:</h3>
             <p className="text-base">15초 동안 최대한 많은 점수를 획득하세요!</p>
-            <p className="text-base text-pink-600 font-bold mt-2">
-              점수를 가장 많이 획득하고 전화번호를 입력한 상위 3명에게 상품을 드립니다.
-            </p>
-            <p className="text-xs text-gray-500 mt-1">
-              입력한 전화번호는 공개되지 않습니다.
-            </p>
           </div>
         </div>
         <div className="flex flex-col gap-2 mt-6">

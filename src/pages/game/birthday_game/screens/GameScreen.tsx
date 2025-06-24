@@ -1,5 +1,5 @@
 import React from 'react'
-import type { GameScreenProps } from '../../../stores/event'
+import type { GameScreenProps } from '../../../../stores/birthday'
 import { InteractiveCharacter } from './InteractiveCharacter'
 import { PixelSkyBackground } from './PixelSkyBackground'
 
