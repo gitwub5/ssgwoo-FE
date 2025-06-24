@@ -7,8 +7,9 @@ import { CommunityDetail } from '../pages/community/detail-page/CommunityDetail'
 import { CommunityWrite } from '../pages/community/CommunityWrite'
 import { CommunityRulesPage } from '../pages/community/CommunityRulesPage'
 import { GamePage } from '../pages/game/GamePage'
+import { NumberGamePage } from '../pages/game/number_game/NumberGamePage'
 import { AiChatPage } from '../pages/ai_chat/AiChatPage'
-import { EventPage } from '../pages/event/EventPage'
+import { BirthdayGamePage } from '../pages/game/birthday_game/BirthdayGamePage'
 import { AdminPage } from '../pages/admin/AdminPage'
 import '../index.css'
 
@@ -20,9 +21,9 @@ function App() {
     <BrowserRouter>
       <Appbar />
       <Routes>
-        <Route path="/event" element={
+        <Route path="/game/birthday" element={
           <div className="min-w-[360px] max-w-2xl mx-auto pt-[60px]">
-            <EventPage />
+            <BirthdayGamePage />
           </div>
         } />
         <Route path="/" element={<div className="min-w-[360px] max-w-2xl mx-auto p-4 pt-20"><HomePage /></div>} />
@@ -33,6 +34,7 @@ function App() {
         <Route path="/community/rules" element={<div className="min-w-[360px] max-w-2xl mx-auto p-4 pt-20"><CommunityRulesPage /></div>} />
         <Route path="/community/:id" element={<div className="min-w-[360px] max-w-2xl mx-auto p-4 pt-20"><CommunityDetail /></div>} />
         <Route path="/game" element={<div className="min-w-[360px] max-w-2xl mx-auto p-4 pt-20"><GamePage /></div>} />
+        <Route path="/game/number" element={<div className="min-w-[360px] max-w-2xl mx-auto p-4 pt-20"><NumberGamePage /></div>} />
         <Route path="/ai" element={<div className="min-w-[360px] max-w-2xl mx-auto p-4 pt-20"><AiChatPage /></div>} />
       </Routes>
     </BrowserRouter>

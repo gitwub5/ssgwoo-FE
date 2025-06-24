@@ -1,5 +1,5 @@
 import React from 'react'
-import type { ScoreboardScreenProps } from '../../../stores/event'
+import type { ScoreboardScreenProps } from '../../../../stores/birthday'
 import { PixelSkyBackground } from './PixelSkyBackground'
 
 interface ScoreboardScreenWithPagingProps extends ScoreboardScreenProps {

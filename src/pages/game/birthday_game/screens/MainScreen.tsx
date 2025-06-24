@@ -1,5 +1,5 @@
 import React from 'react'
-import type { MainScreenProps } from '../../../stores/event'
+import type { MainScreenProps } from '../../../../stores/birthday'
 import { PixelSkyBackground } from './PixelSkyBackground'
 
 export const MainScreen: React.FC<MainScreenProps> = ({ onStart, onShowScoreboard }) => {

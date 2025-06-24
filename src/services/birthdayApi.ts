@@ -1,14 +1,22 @@
 import axios from 'axios'
-import type { Score } from '../stores/event'
+import type { Score } from '../stores/birthday'
 import config from '../config'
 
 const API_BASE_URL = config.api.baseUrl
+
+export interface GameSession {
+  startTime: number
+  endTime: number
+  totalAttacks: number
+  successfulHits: number
+  gameDuration: number
+  invalidated: boolean
+}
 
 export interface SubmitScoreRequest {
   nickname: string
   score: number
   date: Date
-  phoneNumber?: string
 }
 
 export interface SubmitScoreResponse {
@@ -23,7 +31,7 @@ export interface GetScoresResponse {
   totalPages: number
 }
 
-export const eventApi = {
+export const birthdayApi = {
   // 순위 데이터 가져오기
   getScores: async (pageId: number): Promise<GetScoresResponse> => {
     try {

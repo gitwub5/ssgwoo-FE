@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import type { Character, AttackResult, AttackType } from '../../stores/event'
-import { useEventStore } from '../../stores/event'
+import type { Character, AttackResult, AttackType } from '../../../stores/birthday'
+import { useBirthdayStore, GAME_CONFIG } from '../../../stores/birthday'
 import {
   MainScreen,
   RulesScreen,
@@ -11,7 +11,7 @@ import {
 } from './screens/index'
 import { GameEndScreen } from './screens/CountdownScreen'
 
-export const EventPage = () => {
+export const BirthdayGamePage = () => {
   // Zustand store에서 상태와 액션 가져오기
   const {
     currentState,
@@ -19,7 +19,6 @@ export const EventPage = () => {
     timeLeft,
     countdown,
     nickname,
-    phoneNumber,
     scores,
     isLoading,
     error,
@@ -31,16 +30,68 @@ export const EventPage = () => {
     setTimeLeft,
     setCountdown,
     setNickname,
-    setPhoneNumber,
     resetGame,
     fetchScores,
     submitScore,
+    startGameSession,
+    recordAttack,
 
-  } = useEventStore()
+  } = useBirthdayStore()
 
   // 로컬 상태 (캐릭터 관련)
   const [character, setCharacter] = useState<Character>({ defending: null, hit: null })
   const [lastResult, setLastResult] = useState<AttackResult | null>(null)
+
+  // 개발자 도구 감지 및 게임 보호
+  useEffect(() => {
+    const detectDevTools = () => {
+      if (currentState === 'game' && (
+        window.outerHeight - window.innerHeight > 200 ||
+        window.outerWidth - window.innerWidth > 200
+      )) {
+        // 개발자 도구가 열렸을 때 게임 종료
+        setCurrentState('gameend')
+        setScore(0) // 점수 무효화
+      }
+    }
+
+    const interval = setInterval(detectDevTools, 1000)
+    return () => clearInterval(interval)
+  }, [currentState, setCurrentState, setScore])
+
+  // 키보드 단축키 비활성화
+  useEffect(() => {
+    const preventShortcuts = (e: KeyboardEvent) => {
+      if (currentState === 'game') {
+        // F12, Ctrl+Shift+I, Ctrl+U 등 비활성화
+        if (
+          e.key === 'F12' ||
+          (e.ctrlKey && e.shiftKey && e.key === 'I') ||
+          (e.ctrlKey && e.key === 'U') ||
+          (e.ctrlKey && e.shiftKey && e.key === 'C')
+        ) {
+          e.preventDefault()
+          return false
+        }
+      }
+    }
+
+    document.addEventListener('keydown', preventShortcuts)
+    return () => document.removeEventListener('keydown', preventShortcuts)
+  }, [currentState])
+
+  // 우클릭 메뉴 비활성화
+  useEffect(() => {
+    const preventContextMenu = (e: MouseEvent) => {
+      if (currentState === 'game') {
+        e.preventDefault()
+        return false
+      }
+    }
+
+    document.addEventListener('contextmenu', preventContextMenu)
+    return () => document.removeEventListener('contextmenu', preventContextMenu)
+  }, [currentState])
 
   // 초기 데이터 로드
   useEffect(() => {
@@ -50,7 +101,11 @@ export const EventPage = () => {
   // 카운트다운(게임 시간) useEffect
   useEffect(() => {
     if (currentState !== 'game') return
-    setTimeLeft(15)
+    
+    // 게임 시작 시 세션 시작
+    startGameSession()
+    setTimeLeft(GAME_CONFIG.GAME_DURATION)
+    
     const timer = setInterval(() => {
       setTimeLeft((prev: number) => {
         if (prev <= 1) {
@@ -62,7 +117,27 @@ export const EventPage = () => {
       })
     }, 1000)
     return () => clearInterval(timer)
-  }, [currentState, setTimeLeft, setCurrentState])
+  }, [currentState, setTimeLeft, setCurrentState, startGameSession])
+
+  // 게임 시간 초과 감지 및 0점 처리
+  useEffect(() => {
+    if (currentState !== 'game') return
+    
+    const gameStartTime = Date.now()
+    
+    const timeCheckInterval = setInterval(() => {
+      const elapsedTime = Date.now() - gameStartTime
+      
+      if (elapsedTime > GAME_CONFIG.GAME_DURATION_MS) {
+        // 설정된 시간 초과 시 즉시 게임 종료 및 0점 처리
+        clearInterval(timeCheckInterval)
+        setScore(0)
+        setCurrentState('gameend')
+      }
+    }, 100) // 100ms마다 체크하여 정확한 시간 감지
+    
+    return () => clearInterval(timeCheckInterval)
+  }, [currentState, setScore, setCurrentState])
 
   // 게임 종료 카운트다운 (gameend 상태에서 2초 후 result로)
   useEffect(() => {
@@ -88,7 +163,7 @@ export const EventPage = () => {
   // 게임 시작 전 카운트다운
   const startCountdown = () => {
     setCurrentState('countdown')
-    setCountdown(3)
+    setCountdown(GAME_CONFIG.COUNTDOWN_DURATION)
     const startGame = () => {
       resetGame()
       setCharacter({ defending: null, hit: null })
@@ -117,6 +192,9 @@ export const EventPage = () => {
     const attack = attackMap[attackType]
     const isHit = character.defending !== attack.target
     
+    // 공격 기록
+    recordAttack(isHit)
+    
     if (isHit) {
       setScore(score + attack.points)
       setCharacter(prev => ({ ...prev, hit: attack.target }))
@@ -141,22 +219,8 @@ export const EventPage = () => {
         ? '닉네임은 최대 10자까지 가능합니다.'
         : ''
 
-  // 전화번호 유효성 검사
-  const phoneRegex = /^010[0-9]{8}$/
-  const isPhoneValid = phoneNumber.trim() === '' || phoneRegex.test(phoneNumber.trim())
-  const phoneError =
-    phoneNumber.trim() === ''
-      ? ''
-      : !phoneRegex.test(phoneNumber.trim())
-        ? '11자리 번호를 입력하세요.'
-        : ''
-
-  const handlePhoneNumberChange = (value: string) => {
-    setPhoneNumber(value)
-  }
-
   const handleSubmitScore = async () => {
-    if (!isNicknameValid || !isPhoneValid) return
+    if (!isNicknameValid) return
     try {
       await submitScore(nickname, score)
       setCurrentState('leaderboard')
@@ -219,9 +283,6 @@ export const EventPage = () => {
           nicknameError={nicknameError}
           isLoading={isLoading}
           error={error}
-          phoneNumber={phoneNumber}
-          onPhoneNumberChange={handlePhoneNumberChange}
-          phoneError={phoneError}
         />
       )
     
