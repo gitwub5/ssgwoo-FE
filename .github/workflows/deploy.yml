@@ -8,7 +8,6 @@ on:
 env:
   REGISTRY: docker.io
   IMAGE_NAME: ssgwoo/ssgwoo-frontend
-  DEPLOY_YAML_PATH: k8s/frontend-deployment.yaml
   VITE_API_URL: "https://api.ssgwoo.com"
 
 jobs:
@@ -18,9 +17,6 @@ jobs:
     permissions:
       contents: read
       packages: write
-    
-    outputs:
-        image_tag: ${{ steps.meta.outputs.version }}
 
     steps:
       - name: Checkout code
@@ -35,30 +31,19 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Extract metadata (image tags, labels)
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=sha,format=short,prefix=v
-            type=ref,event=branch,prefix=v
-            latest
-
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:v${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
             VITE_API_URL=${{ env.VITE_API_URL }}
 
   update-deployment:
-    name: Update K8s YAML and Commit
+    name: Update Deployment
     needs: build-and-push
     runs-on: ubuntu-22.04
     permissions:
@@ -68,16 +53,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Update image tag in YAML
+      - name: Update deployment.yaml
         run: |
-          TAG=${{ needs.build-and-push.outputs.image_tag }}
-          echo "Updating image tag to: $TAG"
-          sed -i "s|\(image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:\).*|\1$TAG|" ${{ env.DEPLOY_YAML_PATH }}
+          # Get the short SHA of the current commit
+          SHORT_SHA=$(echo ${{ github.sha }} | cut -c1-7)
+          
+          # Update the image tag in deployment.yaml
+          sed -i "s|image: .*|image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:v$SHORT_SHA|" k8s/frontend-deployment.yaml
 
-      - name: Commit and push updated YAML
+      - name: Commit and push changes
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add ${{ env.DEPLOY_YAML_PATH }}
-          git commit -m "ci: update image tag to $TAG" || echo "No changes to commit"
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add k8s/
+          git commit -m "🔄 Update deployment image to ${{ github.sha }}"
           git push
