@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: docker.io/ssgwoo/ssgwoo-frontend:vdeploy
+          image: docker.io/ssgwoo/ssgwoo-frontend:v7a5e721
           imagePullPolicy: Always
           ports:
             - containerPort: 80
