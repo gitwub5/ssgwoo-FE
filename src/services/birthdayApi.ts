@@ -4,14 +4,7 @@ import config from '../config'
 
 const API_BASE_URL = config.api.baseUrl
 
-export interface GameSession {
-  startTime: number
-  endTime: number
-  totalAttacks: number
-  successfulHits: number
-  gameDuration: number
-  invalidated: boolean
-}
+
 
 export interface SubmitScoreRequest {
   nickname: string

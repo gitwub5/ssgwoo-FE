@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { birthdayApi, type GameSession } from '../services/birthdayApi'
+import { birthdayApi } from '../services/birthdayApi'
 
 // 게임 설정 상수
 const GAME_CONFIG = {
@@ -91,6 +91,16 @@ export interface GameState {
   totalAttacks: number
   successfulHits: number
 }
+
+export interface GameSession {
+  startTime: number
+  endTime: number
+  totalAttacks: number
+  successfulHits: number
+  gameDuration: number
+  invalidated: boolean
+}
+
 
 interface BirthdayStore extends GameState {
   // API 액션들
