@@ -19,6 +19,9 @@ export const RulesScreen: React.FC<RulesScreenProps> = ({ onStartGame, onBackToM
             <h4 className="font-bold text-lg">방어 시스템:</h4>
             <p className="text-base">캐릭터가 랜덤하게 부위를 막습니다</p>
             <p className="text-base">막고 있는 부위 공격 시 <span className="font-bold text-red-500">MISS!</span></p>
+            <p className="text-base text-red-600">✊ 머리 방어 시 → <span className="font-bold">-50점</span></p>
+            <p className="text-base text-red-600">✋ 몸통 방어 시 → <span className="font-bold">-60점</span></p>
+            <p className="text-base text-red-600">🦶 다리 방어 시 → <span className="font-bold">-75점</span></p>
           </div>
           <div>
             <h3 className="font-bold text-lg">목표:</h3>

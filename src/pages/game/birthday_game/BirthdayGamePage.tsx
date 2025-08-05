@@ -128,7 +128,13 @@ export const BirthdayGamePage = () => {
     const timeCheckInterval = setInterval(() => {
       const elapsedTime = Date.now() - gameStartTime
       
-      if (elapsedTime > GAME_CONFIG.GAME_DURATION_MS) {
+      // 모바일 환경 감지
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+      const maxAllowedTime = isMobile 
+        ? GAME_CONFIG.GAME_DURATION_MS + GAME_CONFIG.MOBILE_TOLERANCE_MS
+        : GAME_CONFIG.GAME_DURATION_MS
+      
+      if (elapsedTime > maxAllowedTime) {
         // 설정된 시간 초과 시 즉시 게임 종료 및 0점 처리
         clearInterval(timeCheckInterval)
         setScore(0)
@@ -184,9 +190,9 @@ export const BirthdayGamePage = () => {
 
   const attack = (attackType: AttackType) => {
     const attackMap = {
-      punch: { target: 'head' as const, points: 100, name: '죽빵' },
-      smash: { target: 'body' as const, points: 120, name: '등짝스매슁' },
-      kick: { target: 'butt' as const, points: 150, name: '싸커킥' }
+      punch: { target: 'head' as const, points: 100, penalty: -50, name: '죽빵' },
+      smash: { target: 'body' as const, points: 120, penalty: -60, name: '등짝스매슁' },
+      kick: { target: 'butt' as const, points: 150, penalty: -75, name: '싸커킥' }
     }
 
     const attack = attackMap[attackType]
@@ -204,7 +210,15 @@ export const BirthdayGamePage = () => {
         setCharacter(prev => ({ ...prev, hit: null }))
       }, 300)
     } else {
-      setLastResult({ type: 'MISS', attack: attack.name })
+      // 막는 부위를 때리면 페널티 점수
+      const penaltyPoints = attack.penalty
+      setScore(score + penaltyPoints)
+      setCharacter(prev => ({ ...prev, hit: attack.target }))
+      setLastResult({ type: 'MISS', points: penaltyPoints, attack: attack.name })
+      
+      setTimeout(() => {
+        setCharacter(prev => ({ ...prev, hit: null }))
+      }, 300)
     }
 
     setTimeout(() => setLastResult(null), 1000)

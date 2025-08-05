@@ -33,7 +33,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({ timeLeft, score, charact
             <div className="text-2xl font-bold pixel-font min-h-[32px] drop-shadow-[0_0_6px_rgba(255,255,0,0.7)]"
               style={{ color: lastResult ? (lastResult.type === 'HIT' ? '#ffe066' : '#ff4d4f') : '#00e0ff', letterSpacing: '2px' }}>
               {lastResult
-                ? (lastResult.type === 'HIT' ? `HIT! +${lastResult.points}` : 'MISS!')
+                ? (lastResult.type === 'HIT' ? `HIT! +${lastResult.points}` : `MISS! ${lastResult.points}`)
                 : ''}
             </div>
           </div>

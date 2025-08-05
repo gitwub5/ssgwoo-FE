@@ -7,6 +7,7 @@ const GAME_CONFIG = {
   GAME_DURATION_MS: 15000, // 게임 시간 (밀리초)
   COUNTDOWN_DURATION: 3, // 카운트다운 시간 (초)
   MAX_GAME_TIME_MS: 16000, // 최대 허용 게임 시간 (여유분 포함)
+  MOBILE_TOLERANCE_MS: 2000, // 모바일 환경에서의 시간 허용 오차 (2초)
 } as const
 
 // 게임 로직 타입들
@@ -20,7 +21,7 @@ export interface Character {
 
 export interface AttackResult {
   type: 'HIT' | 'MISS'
-  points?: number
+  points: number
   attack?: string
 }
 
@@ -158,6 +159,18 @@ export const useBirthdayStore = create<BirthdayStore>((set, get) => ({
         throw new Error('게임 세션 정보가 없습니다.')
       }
       
+      // 디버깅을 위한 로그 (개발 환경에서만)
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Game Session Debug:', {
+          gameDuration: gameSession.gameDuration,
+          invalidated: gameSession.invalidated,
+          isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
+          maxAllowedTime: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
+            ? GAME_CONFIG.GAME_DURATION_MS + GAME_CONFIG.MOBILE_TOLERANCE_MS 
+            : GAME_CONFIG.GAME_DURATION_MS
+        })
+      }
+      
       // 시간 초과된 게임은 점수를 0으로 처리
       const finalScore = gameSession.invalidated ? 0 : score
       
@@ -216,8 +229,16 @@ export const useBirthdayStore = create<BirthdayStore>((set, get) => ({
     const endTime = Date.now()
     const gameDuration = endTime - state.gameStartTime
     
+    // 모바일 환경 감지
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+    
     // 게임 시간이 설정된 시간을 초과하면 0점 처리
-    if (gameDuration > GAME_CONFIG.GAME_DURATION_MS) {
+    // 모바일 환경에서는 허용 오차를 적용
+    const maxAllowedTime = isMobile 
+      ? GAME_CONFIG.GAME_DURATION_MS + GAME_CONFIG.MOBILE_TOLERANCE_MS
+      : GAME_CONFIG.GAME_DURATION_MS
+    
+    if (gameDuration > maxAllowedTime) {
       return {
         startTime: state.gameStartTime,
         endTime,
